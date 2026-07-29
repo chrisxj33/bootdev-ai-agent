@@ -1,0 +1,2 @@
+# file read tool
+MAX_CHARS = 10000

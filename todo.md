@@ -1,0 +1,1 @@
+- Review /functions and ensure none leak abs path back to the LLM. Noticed some return "resolve_path" abs result which the LLM should not really know about

@@ -1,6 +1,11 @@
 import os
 
-def resolve_path(working_directory: str, target: str):
+def resolve_path(
+    working_directory: str, target: str
+) -> tuple[str, None] | tuple[None, str]:
+    """
+    Returns an absolute path to the specified target
+    """
     working_dir_abs = os.path.abspath(working_directory)
     target_abs = os.path.normpath(os.path.join(working_dir_abs, target))
     valid_target = os.path.commonpath([working_dir_abs, target_abs]) == working_dir_abs
@@ -9,5 +14,3 @@ def resolve_path(working_directory: str, target: str):
         return None, f'  Error: "{target}" is outside the permitted working directory'
 
     return target_abs, None
-        
-

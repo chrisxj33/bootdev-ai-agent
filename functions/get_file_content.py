@@ -1,6 +1,23 @@
 from functions.validate import resolve_path
 from config import MAX_CHARS
 
+schema_get_file_content = {
+    "type": "function",
+    "function": {
+        "name": "get_file_content",
+        "description": f"Gets file contents of a specified files path relative to the working directory, truncating contents if greater than {MAX_CHARS}",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "File path to read contents from, relative to the working directory. This arg is required.",
+                },
+            },
+        },
+    },
+}
+
 def get_file_content(working_directory: str, file_path: str) -> str:
     try:
         header = f'Result for {file_path}\n'

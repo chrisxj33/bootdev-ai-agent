@@ -2,6 +2,28 @@ from functions.validate import resolve_path
 import subprocess
 import os
 
+schema_run_python_file = {
+    "type": "function",
+    "function": {
+        "name": "run_python_file",
+        "description": "Runs a python file relative to the working directory and returns its results.",
+        "parameters": {
+            "type": "object",
+            "required": ["file_path"],
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "File path to the '.py' file relative to the working directory. This arg is required.",
+                "args": {
+                    "type": "list[str]",
+                    "description": "A list of the args to pass to the Python file."
+                }
+                },
+            },
+        },
+    },
+}
+
 def run_python_file(
     working_directory: str, file_path: str, args: list[str] | None = None
 ) -> str:

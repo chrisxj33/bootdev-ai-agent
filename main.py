@@ -5,7 +5,7 @@ from openai import OpenAI
 import json
 
 from prompts import system_prompt
-from call_function import available_functions
+from call_function import available_functions, call_function
 
 def main():
     load_dotenv()
@@ -31,27 +31,41 @@ def main():
         {"role": "user", "content": args.user_prompt,}
     ]
 
-    response = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        tools=available_functions
-    )
+    for _ in range(20):
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            tools=available_functions
+        )
 
-    if not response.usage.prompt_tokens or not response.usage.completion_tokens:
-        raise RuntimeError("Returned tokens are None, they may be an issue with the model")
+        if args.verbose:
+            print(f"User prompt: {args.user_prompt}")
+            print(f"Prompt tokens: {response.usage.prompt_tokens}")
+            print(f"Response tokens: {response.usage.completion_tokens}")
 
-    if args.verbose:
-        print(f"User prompt: {args.user_prompt}")
-        print(f"Prompt tokens: {response.usage.prompt_tokens}")
-        print(f"Response tokens: {response.usage.completion_tokens}")
+        if not response.usage.prompt_tokens or not response.usage.completion_tokens:
+            raise RuntimeError("Returned tokens are None, they may be an issue with the model")
 
-    message = response.choices[0].message
+        message = response.choices[0].message
+        messages.append(message)
 
-    for tool_call in message.tool_calls:
-        function_args = json.loads(tool_call.function.arguments or "{}")
-        print(f"Calling function: {tool_call.function.name}({function_args})")
+        if not message.tool_calls:
+            print(message.content)
+            return
 
-    print(message.content)
+        for tool_call in message.tool_calls:
+            result_message = call_function(tool_call, args.verbose)
+
+            if not result_message["content"]:
+                raise RuntimeError("Tool calls returned contents are empty")
+
+            if args.verbose:
+                print(f"-> {result_message['content']}")
+
+            messages.append(result_message)
+
+    # if loop did not return final response
+    raise RuntimeError("Model reached max number of iterations.")
 
 
 if __name__ == "__main__":

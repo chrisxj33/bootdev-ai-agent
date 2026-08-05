@@ -8,6 +8,7 @@ schema_get_file_content = {
         "description": f"Gets file contents of a specified files path relative to the working directory, truncating contents if greater than {MAX_CHARS}",
         "parameters": {
             "type": "object",
+            "required": ["file_path"],
             "properties": {
                 "file_path": {
                     "type": "string",
